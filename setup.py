@@ -6,7 +6,7 @@ setuptools.setup(
     author="DigiNova",
     author_email='info@diginova.com.tr',
     description="Package",
-    url='https://github.com/novavision-ai/package',
+    url='https://github.com/CengizOkan/ImageQuality',
     license='MIT',
     install_requires=['sdk', 'opencv-python-headless'],
 
