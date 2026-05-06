@@ -1,5 +1,5 @@
 from sdks.novavision.src.helper.package import PackageHelper
-from capsules.ImageQuality.src.models.PackageModel import (
+from components.ImageQuality.src.models.PackageModel import (
     PackageModel, PackageConfigs, ConfigExecutor,
     JpegQualityOutputs, JpegQualityResponse, JpegQuality,
     OutputImage
