@@ -5,7 +5,6 @@ from sdks.novavision.src.base.model import (
     Output, Input, Config
 )
 
-# --- 1. Input ve Output Tanımlamaları ---
 class TargetImage(Input):
     name: Literal["targetImage"] = "targetImage"
     value: Union[List[Image], Image]
@@ -38,7 +37,6 @@ class OutputImage(Output):
     class Config:
         title = "Output Image"
 
-# --- 2. Konfigürasyonlar ---
 class ConfigJpegQuality(Config):
     """
     Sets the JPEG compression quality factor.
@@ -56,7 +54,6 @@ class ConfigJpegQuality(Config):
             "shortDescription": "Compression Quality (0-100)"
         }
 
-# --- 3. Executor Parametre ve Veri Yapıları ---
 class JpegQualityInputs(Inputs):
     targetImage: TargetImage
 
@@ -66,7 +63,6 @@ class JpegQualityConfigs(Configs):
 class JpegQualityOutputs(Outputs):
     outputImage: OutputImage
 
-# --- 4. Request / Response Zinciri ---
 class JpegQualityRequest(Request):
     inputs: Optional[JpegQualityInputs]
     configs: JpegQualityConfigs
@@ -79,7 +75,6 @@ class JpegQualityRequest(Request):
 class JpegQualityResponse(Response):
     outputs: JpegQualityOutputs
 
-# --- 5. Executor Tanımı ---
 class JpegQuality(Config):
     name: Literal["JpegQuality"] = "JpegQuality"
     value: Union[JpegQualityRequest, JpegQualityResponse]
@@ -94,7 +89,6 @@ class JpegQuality(Config):
             }
         }
 
-# --- 6. Paket Çatısı ---
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
     value: Union[JpegQuality]  

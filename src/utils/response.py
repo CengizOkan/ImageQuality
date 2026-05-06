@@ -6,17 +6,14 @@ from components.ImageQuality.src.models.PackageModel import (
 )
 
 def build_response(context):
-    # Build outputs
     output_image = OutputImage(value=context.target_image)
     outputs = JpegQualityOutputs(outputImage=output_image)
     
-    # Build response chain
     executor_response = JpegQualityResponse(outputs=outputs)
     executor = JpegQuality(value=executor_response)
     config_executor = ConfigExecutor(value=executor)
     package_configs = PackageConfigs(executor=config_executor)
     
-    # Build package model
     package = PackageHelper(
         packageModel=PackageModel,
         packageConfigs=package_configs

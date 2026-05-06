@@ -1,6 +1,3 @@
-"""
-    Applies JPEG compression to the input image to modify its quality and simulate compression artifacts.
-"""
 import os
 import sys
 import cv2
@@ -18,13 +15,10 @@ class JpegQuality(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
         
-        # Parse request with model
         self.request.model = PackageModel(**(self.request.data))
         
-        # Extract parameters
         self.q_value = self.request.get_param("ConfigJpegQuality")
         
-        # Extract inputs
         self.target_image = self.request.get_param("targetImage")
     
     @staticmethod
@@ -42,23 +36,19 @@ class JpegQuality(Component):
         return img_matrix
     
     def run(self):
-        # Get image from Redis
         target = Image.get_frame(
             img=self.target_image, 
             redis_db=self.redis_db
         )
         
-        # Process image matrix
         target.value = self.process_quality(np.array(target.value))
         
-        # Store result to Redis
         self.target_image = Image.set_frame(
             img=target, 
             package_uID=self.uID, 
             redis_db=self.redis_db
         )
-        
-        # Build and return response
+
         package_model = build_response(context=self)
         return package_model
 
