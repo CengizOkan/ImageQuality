@@ -1,14 +1,16 @@
-
 from pydantic import Field, validator
 from typing import List, Optional, Union, Literal
-from sdks.novavision.src.base.model import Package, Image, Inputs, Configs, Outputs, Response, Request, Output, Input, Config
+from sdks.novavision.src.base.model import (
+    Package, Image, Inputs, Configs, Outputs, Response, Request, 
+    Output, Input, Config
+)
 
-
-class InputImage(Input):
-    name: Literal["inputImage"] = "inputImage"
+# --- 1. Input ve Output Tanımlamaları ---
+class TargetImage(Input):
+    name: Literal["targetImage"] = "targetImage"
     value: Union[List[Image], Image]
     type: str = "object"
-
+    
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
         value = values.get('value')
@@ -16,16 +18,15 @@ class InputImage(Input):
             return "object"
         elif isinstance(value, list):
             return "list"
-
+    
     class Config:
-        title = "Image"
-
+        title = "Input Image"
 
 class OutputImage(Output):
     name: Literal["outputImage"] = "outputImage"
-    value: Union[List[Image],Image]
+    value: Union[List[Image], Image]
     type: str = "object"
-
+    
     @validator("type", pre=True, always=True)
     def set_type_based_on_value(cls, value, values):
         value = values.get('value')
@@ -33,118 +34,83 @@ class OutputImage(Output):
             return "object"
         elif isinstance(value, list):
             return "list"
-
+    
     class Config:
-        title = "Image"
+        title = "Output Image"
 
-
-class KeepSideFalse(Config):
-    name: Literal["False"] = "False"
-    value: Literal[False] = False
-    type: Literal["bool"] = "bool"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Disable"
-
-
-class KeepSideTrue(Config):
-    name: Literal["True"] = "True"
-    value: Literal[True] = True
-    type: Literal["bool"] = "bool"
-    field: Literal["option"] = "option"
-
-    class Config:
-        title = "Enable"
-
-
-class KeepSideBBox(Config):
+# --- 2. Konfigürasyonlar ---
+class ConfigJpegQuality(Config):
     """
-        Rotate image without catting off sides.
+    Sets the JPEG compression quality factor.
+    100 is the highest quality (lowest compression), and 0 is the lowest quality (highest compression).
     """
-    name: Literal["KeepSide"] = "KeepSide"
-    value: Union[KeepSideTrue, KeepSideFalse]
-    type: Literal["object"] = "object"
-    field: Literal["dropdownlist"] = "dropdownlist"
-
-    class Config:
-        title = "Keep Sides"
-
-
-class Degree(Config):
-    """
-        Positive angles specify counterclockwise rotation while negative angles indicate clockwise rotation.
-    """
-    name: Literal["Degree"] = "Degree"
-    value: int = Field(ge=-359.0, le=359.0,default=0)
+    name: Literal["ConfigJpegQuality"] = "ConfigJpegQuality"
+    value: int = Field(default=90, ge=0, le=100)
     type: Literal["number"] = "number"
     field: Literal["textInput"] = "textInput"
-    placeHolder: Literal["[-359, 359]"] = "[-359, 359]"
-
+    placeHolder: Literal["[0, 100]"] = "[0, 100]"
+    
     class Config:
-        title = "Angle"
+        title = "JPEG Quality"
+        json_schema_extra = {
+            "shortDescription": "Compression Quality (0-100)"
+        }
 
+# --- 3. Executor Parametre ve Veri Yapıları ---
+class JpegQualityInputs(Inputs):
+    targetImage: TargetImage
 
-class PackageInputs(Inputs):
-    inputImage: InputImage
+class JpegQualityConfigs(Configs):
+    configJpegQuality: ConfigJpegQuality
 
-
-class PackageConfigs(Configs):
-    degree: Degree
-    drawBBox: KeepSideBBox
-
-
-class PackageOutputs(Outputs):
+class JpegQualityOutputs(Outputs):
     outputImage: OutputImage
 
-
-class PackageRequest(Request):
-    inputs: Optional[PackageInputs]
-    configs: PackageConfigs
-
+# --- 4. Request / Response Zinciri ---
+class JpegQualityRequest(Request):
+    inputs: Optional[JpegQualityInputs]
+    configs: JpegQualityConfigs
+    
     class Config:
         json_schema_extra = {
             "target": "configs"
         }
 
+class JpegQualityResponse(Response):
+    outputs: JpegQualityOutputs
 
-class PackageResponse(Response):
-    outputs: PackageOutputs
-
-
-class PackageExecutor(Config):
-    name: Literal["Package"] = "Package"
-    value: Union[PackageRequest, PackageResponse]
+# --- 5. Executor Tanımı ---
+class JpegQuality(Config):
+    name: Literal["JpegQuality"] = "JpegQuality"
+    value: Union[JpegQualityRequest, JpegQualityResponse]
     type: Literal["object"] = "object"
     field: Literal["option"] = "option"
-
+    
     class Config:
-        title = "Package"
+        title = "JPEG Quality Modifier"
         json_schema_extra = {
             "target": {
-                "value": 0
+                "value": 0 
             }
         }
 
-
+# --- 6. Paket Çatısı ---
 class ConfigExecutor(Config):
     name: Literal["ConfigExecutor"] = "ConfigExecutor"
-    value: Union[PackageExecutor]
+    value: Union[JpegQuality]  
     type: Literal["executor"] = "executor"
     field: Literal["dependentDropdownlist"] = "dependentDropdownlist"
-
+    
     class Config:
         title = "Task"
         json_schema_extra = {
             "target": "value"
         }
 
-
 class PackageConfigs(Configs):
     executor: ConfigExecutor
-
 
 class PackageModel(Package):
     configs: PackageConfigs
     type: Literal["component"] = "component"
-    name: Literal["Package"] = "Package"
+    name: Literal["ImageQuality"] = "ImageQuality"
