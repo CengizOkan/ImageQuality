@@ -26,6 +26,7 @@ class JpegQuality(Component):
         return {}
     
     def process_quality(self, img_matrix):
+        """Compresses and decompresses image to apply target JPEG Q-factor"""
         encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), self.q_value]
         success, encoded_image = cv2.imencode('.jpg', img_matrix, encode_param)
         
