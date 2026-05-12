@@ -98,7 +98,8 @@ class ConfigExecutor(Config):
     class Config:
         title = "Task"
         json_schema_extra = {
-            "target": "value"
+            "target": "value",
+            "shortDescription": "Select the quality modifier task to execute on the input image"
         }
 
 class PackageConfigs(Configs):
