@@ -19,7 +19,7 @@ class TargetImage(Input):
             return "list"
     
     class Config:
-        title = "Input Image"
+        title = "Image"
 
 class OutputImage(Output):
     name: Literal["outputImage"] = "outputImage"
@@ -35,7 +35,7 @@ class OutputImage(Output):
             return "list"
     
     class Config:
-        title = "Output Image"
+        title = "Image"
 
 class ConfigJpegQuality(Config):
     """
