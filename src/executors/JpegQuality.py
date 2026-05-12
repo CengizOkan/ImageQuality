@@ -14,11 +14,8 @@ from components.ImageQuality.src.models.PackageModel import PackageModel
 class JpegQuality(Component):
     def __init__(self, request, bootstrap):
         super().__init__(request, bootstrap)
-        
         self.request.model = PackageModel(**(self.request.data))
-        
         self.q_value = self.request.get_param("ConfigJpegQuality")
-        
         self.target_image = self.request.get_param("targetImage")
     
     @staticmethod
